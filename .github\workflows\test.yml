@@ -1,0 +1,42 @@
+name: Deploy to Amazon Linux EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to Amazon Linux EC2
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.PORT }}
+
+          script: |
+            cd /ec2-user/testing
+
+            echo "Pulling latest code..."
+            git fetch origin
+            git reset --hard origin/main
+
+            echo "Installing dependencies..."
+            npm install --production
+
+            echo "Restarting application..."
+            pm2 restart coming-soon-app || pm2 start server.js --name coming-soon-app
+
+            pm2 save
+       
+            
+           
+            
+           
