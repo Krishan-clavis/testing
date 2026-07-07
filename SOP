@@ -1,0 +1,26 @@
+Developer
+    │
+    │ git add / git commit / git push origin main
+    ▼
+GitHub Repository
+    │
+    ▼
+GitHub Actions Workflow Trigger
+    │
+    ▼
+Checkout Latest Code
+    │
+    ▼
+SSH to EC2 Server
+    │
+    ▼
+cd /home/ec2-user/my-node-app
+git pull origin main
+npm install
+pm2 restart app-name
+    │
+    ▼
+Nginx Reverse Proxy
+    │
+    ▼
+Users Access Updated Website
