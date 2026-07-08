@@ -22,7 +22,9 @@ jobs:
           port: ${{ secrets.PORT }}
 
           script: |
-            cd /ec2-user/testing
+            set -e
+
+            cd /home/ec2-user/testing
 
             echo "Pulling latest code..."
             git fetch origin
@@ -31,12 +33,13 @@ jobs:
             echo "Installing dependencies..."
             npm install --production
 
+            export PATH=$PATH:/usr/local/bin
+
             echo "Restarting application..."
+
             pm2 restart coming-soon-app || pm2 start server.js --name coming-soon-app
 
             pm2 save
-       
-            
-           
-            
+
+            echo "Deployment completed successfully"
            
