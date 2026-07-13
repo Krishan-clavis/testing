@@ -37,7 +37,7 @@ jobs:
 
             echo "Restarting application..."
 
-            pm2 restart coming-soon-app || pm2 start server.js --name coming-soon-app
+            pm2 restart /home/ec2-user/testing || pm2 start server.js --name /home/ec2-user/testing
 
             pm2 save
 
