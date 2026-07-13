@@ -42,4 +42,24 @@ jobs:
             pm2 save
 
             echo "Deployment completed successfully"
+
+            name: Deploy Node App
+
+
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            cd /home/ec2-user/testing
+
+            git pull origin main
+
+            docker compose down
+
+            docker compose build --no-cache
+
+            docker compose up -d
+
+            docker image prune -f
            
