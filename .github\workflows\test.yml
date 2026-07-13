@@ -46,23 +46,17 @@ jobs:
             name: Deploy Node App
 
 
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          script: |
-            cd /home/ec2-user/testing
+           git pull origin main
 
-            git pull origin main
+            docker stop testing-my-node-app || true
+            docker rm testing-my-node-app || true
 
-            docker compose down
+            docker build -t testing-my-node-app:latest .
 
-            docker compose build --no-cache
-
-            sudo docker compose build
-
-            sudo docker images
-
-            sudo docker ps -a 
+            docker run -d \
+              --name testing-my-node-app \
+              --restart always \
+              -p 3005:3005 \
+              testing-my-node-app:latest
             
            
