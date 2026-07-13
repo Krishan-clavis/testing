@@ -46,10 +46,8 @@ jobs:
             name: Deploy Node App
 
 
-           git pull origin main
-
-            docker stop testing-my-node-app || true
-            docker rm testing-my-node-app || true
+            docker stop node:20-alpine || true
+            docker rm node:20-alpine || true
 
             docker build -t testing-my-node-app:latest .
 
