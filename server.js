@@ -1,75 +1,41 @@
-const express = require("express");
-const crypto = require("crypto");
-const { exec } = require("child_process");
+// Theme Toggle Logic
+const themeToggle = document.getElementById('theme-toggle');
+const currentTheme = localStorage.getItem('theme');
 
-const app = express();
-
-const PORT = 3005;
-const SECRET = "your_webhook_secret";
-
-// GitHub raw body required
-app.use(
-  express.json({
-    verify: (req, res, buf) => {
-      req.rawBody = buf;
-    },
-  })
-);
-
-function verifySignature(req) {
-  const signature = req.headers["x-hub-signature-256"];
-
-  if (!signature) return false;
-
-  const hmac = crypto.createHmac("sha256", SECRET);
-  hmac.update(req.rawBody);
-
-  const digest = "sha256=" + hmac.digest("hex");
-
-  return crypto.timingSafeEqual(
-    Buffer.from(signature),
-    Buffer.from(digest)
-  );
+if (currentTheme) {
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    if (currentTheme === 'dark') {
+        themeToggle.textContent = '☀️ Mode';
+    }
 }
 
-app.post("/webhook", (req, res) => {
-  if (!verifySignature(req)) {
-    return res.status(401).send("Invalid Signature");
-  }
-
-  console.log("Webhook Received");
-
-  const branch = req.body.ref;
-
-  if (branch !== "refs/heads/main") {
-    return res.send("Ignoring branch");
-  }
-
-  const command = `
-      cd /home/ec2-user/testing &&
-      git reset --hard &&
-      git pull origin main &&
-      docker compose down &&
-      docker compose build --no-cache &&
-      docker compose up -d
-  `;
-
-  exec(command, (error, stdout, stderr) => {
-    if (error) {
-      console.error(error);
-      return;
+themeToggle.addEventListener('click', () => {
+    let theme = document.documentElement.getAttribute('data-theme');
+    if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'light');
+        themeToggle.textContent = '🌙 Mode';
+    } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        themeToggle.textContent = '☀️ Mode';
     }
-
-    console.log(stdout);
-
-    if (stderr) {
-      console.log(stderr);
-    }
-  });
-
-  res.send("Deployment Started");
 });
 
-app.listen(PORT, () => {
-  console.log(`Webhook running on port ${PORT}`);
+// Contact Form Validation Logic
+const contactForm = document.getElementById('contact-form');
+const formFeedback = document.getElementById('form-feedback');
+
+contactForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const emailInput = document.getElementById('email').value;
+
+    if (emailInput.includes('@')) {
+        formFeedback.style.color = 'green';
+        formFeedback.textContent = 'Thank you! Your message has been sent.';
+        contactForm.reset();
+    } else {
+        formFeedback.style.color = 'red';
+        formFeedback.textContent = 'Please enter a valid email address.';
+    }
 });
