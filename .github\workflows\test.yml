@@ -24,37 +24,34 @@ jobs:
           script: |
             set -e
 
+            echo "===== Starting Deployment ====="
+
             cd /home/ec2-user/testing
 
-            echo "Pulling latest code..."
+            echo "Updating code..."
             git fetch origin
             git reset --hard origin/main
 
-            echo "Installing dependencies..."
-            npm install --production
+            echo "Stopping old container..."
+            docker stop testing-my-node-app || true
 
-            export PATH=$PATH:/usr/local/bin
+            echo "Removing old container..."
+            docker rm testing-my-node-app || true
 
-            echo "Restarting application..."
+            echo "Removing old image..."
+            docker rmi testing-my-node-app:latest || true
 
-            pm2 restart /home/ec2-user/testing || pm2 start server.js --name /home/ec2-user/testing
-
-            pm2 save
-
-            echo "Deployment completed successfully"
-
-            name: Deploy Node App
-
-
-            docker stop node:20-alpine || true
-            docker rm node:20-alpine || true
-
+            echo "Building new image..."
             docker build -t testing-my-node-app:latest .
 
+            echo "Starting container..."
             docker run -d \
               --name testing-my-node-app \
-              --restart always \
+              --restart unless-stopped \
               -p 3005:3005 \
               testing-my-node-app:latest
-            
-           
+
+            echo "Cleaning unused images..."
+            docker image prune -f
+
+            echo "===== Deployment Successful ====="
