@@ -1,17 +1,7 @@
-script: |
-  set -e
+git fetch origin
 
-  cd /home/ec2-user/testing
+git reset --hard origin/main
 
-  git fetch origin
-  git reset --hard origin/main
+docker compose down
 
-  docker compose down
-
-  docker compose build --no-cache
-
-  docker compose up -d
-
-  docker image prune -f
-
-  echo "Deployment Successful"
+docker compose up -d --build
