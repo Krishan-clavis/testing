@@ -1,6 +1,6 @@
 FROM node:20-alpine
 
-WORKDIR /home/ec2-user/app
+WORKDIR /home/ec2-user/testing
 
 COPY package*.json ./
 
