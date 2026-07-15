@@ -1,4 +1,4 @@
-name: Deploy to Amazon Linux EC2
+name: Deploy to EC2
 
 on:
   push:
@@ -7,14 +7,16 @@ on:
 
 jobs:
   deploy:
+
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
 
-      - name: Deploy to Amazon Linux EC2
-        uses: appleboy/ssh-action@v1.2.0
+      - uses: actions/checkout@v4
+
+      - name: Deploy
+        uses: appleboy/ssh-action@v1
+
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
@@ -22,36 +24,23 @@ jobs:
           port: ${{ secrets.PORT }}
 
           script: |
-            set -e
-
-            echo "===== Starting Deployment ====="
 
             cd /home/ec2-user/testing
 
-            echo "Updating code..."
             git fetch origin
+
             git reset --hard origin/main
 
-            echo "Stopping old container..."
-            docker stop testing-my-node-app || true
+            docker stop testing || true
 
-            echo "Removing old container..."
-            docker rm testing-my-node-app || true
+            docker rm testing || true
 
-            echo "Removing old image..."
-            docker rmi testing-my-node-app:latest || true
+            docker rmi testing:latest || true
 
-            echo "Building new image..."
-            docker build -t testing-my-node-app:latest .
+            docker build -t testing:latest .
 
-            echo "Starting container..."
             docker run -d \
-              --name testing-my-node-app \
-              --restart unless-stopped \
-              -p 3005:3005 \
-              testing-my-node-app:latest
-
-            echo "Cleaning unused images..."
-            docker image prune -f
-
-            echo "===== Deployment Successful ====="
+            --restart always \
+            --name testing \
+            -p 3001:3005 \
+            testing:latest
