@@ -1,22 +1,12 @@
-script: |
-  set -e
+version: "3.8"
 
-  cd /home/ec2-user/testing
-
-  git fetch origin
-  git reset --hard origin/main
-
-  docker compose down
-
-  docker compose build --no-cache
-
-  docker compose up -d
-  
-  docker compose build 
-
-  docker image prune -f
-
-  echo "Deployment Successful"
-
-
+services:
+  app:
+    container_name: testing-1 
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3005:3005"
+    restart: always
 
