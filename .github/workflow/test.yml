@@ -39,7 +39,7 @@ jobs:
             sudo docker compose build --no-cache
 
             echo "=== Start container ==="
-            sudo docker compose up -d
+            sudo docker compose up -d --force-recreate
 
             echo "=== Running containers ==="
             sudo docker ps
