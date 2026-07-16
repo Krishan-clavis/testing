@@ -10,7 +10,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.2.0
@@ -20,13 +21,31 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.PORT }}
           script: |
+            set -e
+
             cd /home/ec2-user/testing
 
+            echo "=== Pull latest code ==="
             git fetch origin
             git reset --hard origin/main
 
+            echo "=== Stop old container ==="
             sudo docker compose down || true
+
+            echo "=== Remove old image ==="
+            sudo docker rmi testing-app || true
+
+            echo "=== Build new image ==="
             sudo docker compose build --no-cache
+
+            echo "=== Start container ==="
             sudo docker compose up -d
 
+            echo "=== Running containers ==="
             sudo docker ps
+
+            echo "=== All containers ==="
+            sudo docker ps -a
+
+            echo "=== Available images ==="
+            sudo docker images
