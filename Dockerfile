@@ -1,6 +1,6 @@
 FROM node:20-alpine
 
-WORKDIR /home/ec2-user/testing
+WORKDIR /app
 
 COPY package*.json ./
 
@@ -10,10 +10,4 @@ COPY . .
 
 EXPOSE 3001
 
-CMD ["npm", "start"]  
-          
-CMD ["docker compose down"]
-CMD ["docker compose build --no-cache"]
-CMD ["sudo docker compose build"]
-CMD ["sudo docker images"]
-CMD ["sudo docker ps -a"] 
+CMD ["npm", "start"]
